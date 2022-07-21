@@ -1,57 +1,180 @@
-# Template para projetos Java usando o Visual Studio Code
+# 3.1 // Imutabilidade, Representação, Formato e Coesão // Time
 
-Um _template_ é um projeto base, para não iniciar do zero e ter pelo menos uma estrutura mínima onde se apoiar.
+Use este link do GitHub Classroom para ter sua cópia alterável deste repositório: <>
 
-Antes de começar a desenvolver com este _template_ é necessário ter instalado o Java Software Development Kit (JDK), o editor Visual Studio Code (VSCode) e o utilitário de controle de versão de código _Git_.
+Implementar respeitando os fundamentos de Orientação a Objetos.
 
+**Tópicos desta atividade:** imutabilidade, formatos de representação, formatos de entrada, coesão
 
+---
 
-## Instalação e Configuração do JDK
+Implementar uma classe para gerar objetos imutáveis de hora `Time` e suas operações básicas. Considere um instante no dia representado em horas, minutos e segundos, entre `00:00:00` e `23:59:59`. Implementar construtores e métodos para lidar com esse tempo de maneira *fail-safe* (sem rejeitar as entradas, mas adaptando-as). A API (interface do objeto) será implementada na língua inglesa com construtores para `h:m:s`, `h:m`, somente `h` e até vazio (que considera `00:00:00`). Os métodos disponíveis serão `Time#plus(Time):Time`, `Time#plusHours(int):Time`, `Time#plusMinutes(int):Time`, `Time#plusSeconds(int):Time`, `Time#minus(Time):Time`, `Time#minusHours(int):Time`, `Time#minusSeconds(int):Time`, `Time#tick():Time` (adiciona um segundo), `Time#shift():Time` (inverte o turno),`Time#isMidDay():boolean` (questiona se é meio-dia) e `Time#isMidNight():boolean` (questiona se é meia-noite).
 
-É necessário instalar o JDK a partir da versão 8, porém é recomendada versão 11-LTS (Long Term Support - suporte de longo prazo) ou até mesmo a 17-LTS.
+Casos de teste:
 
-Para o Sistema Operacional (SO) Windows, ele pode ser obtido aqui <https://adoptium.net/?variant=openjdk11&jvmVariant=hotspot>. Siga as instruções de instalação e não esqueça de selecionar os opcionais durante o processo, especialmente a parte ⚠️ _"add Java to PATH"_.
+```java
+Time zero = new Time();
+// representação string, padrão 00:00:00
+System.out.println(zero); // 00:00:00
+System.out.println(zero.toString().equals("00:00:00"));
 
-Para Sistemas Operacionais Linux/Debian, como Ubuntu, Pop OS, Mint, Elementary, etc, execute no terminal o comando `sudo apt install openjdk-11-jdk`, que a mágica vai acontecer.
+Time umaHoraQuarentaMinCincoSeg = new Time(1, 40, 5);
+System.out.println(umaHoraQuarentaMinCincoSeg); // 01:40:05
+System.out.println(umaHoraQuarentaMinCincoSeg.toString().equals("01:40:05"));
 
-Para testar a instalação, seja no Windows ou Linux, abra o _Prompt_ de Comando (cmd) ou o Terminal e execute o compilador Java com `javac -version`. A saída deve ser algo com `javac 11.0.9.1`, ou outra versão.
+Time umaHoraQuarentaMinutosCincoSegundos = zero.plus(umaHoraQuarentaMinCincoSeg);
+System.out.println(umaHoraQuarentaMinutosCincoSegundos); // 01:40:05
+System.out.println(umaHoraQuarentaMinutosCincoSegundos.toString().equals("01:40:05"));
+System.out.println(umaHoraQuarentaMinutosCincoSegundos.hours() == 1);
+System.out.println(umaHoraQuarentaMinutosCincoSegundos.minutes() == 40);
+System.out.println(umaHoraQuarentaMinutosCincoSegundos.seconds() == 5);
+// deve ser imutável
+System.out.println(zero.hours() == 0);
+System.out.println(zero.minutes() == 0);
+System.out.println(zero.seconds() == 0);
 
+// plus
+Time tresHorasVinteMinDezSeg = umaHoraQuarentaMinutosCincoSegundos.plus(umaHoraQuarentaMinCincoSeg);
+System.out.println(tresHorasVinteMinDezSeg); // 03:20:10
+System.out.println(tresHorasVinteMinDezSeg.toString().equals("03:20:10"));
+// implementar equals
+System.out.println(tresHorasVinteMinDezSeg.equals(new Time(3, 20, 10)));
 
+Time duasHorasQuarentaMinCincoSeg = umaHoraQuarentaMinCincoSeg.plusHours(1);
+System.out.println(duasHorasQuarentaMinCincoSeg); // 02:40:05
+System.out.println(duasHorasQuarentaMinCincoSeg.toString().equals("02:40:05"));
 
-## Instalação e Configuração do Visual Studio Code (VSCode)
+Time duasHorasVinteMinDezSeg = tresHorasVinteMinDezSeg.plusHours(23);
+System.out.println(duasHorasVinteMinDezSeg); // 02:20:10
+System.out.println(duasHorasVinteMinDezSeg.toString().equals("02:20:10"));
 
-O VSCode pode ser obtido aqui: <https://code.visualstudio.com/download>. A instalação é semelhante nos Sistemas Operacionais Windows e Linux.
+Time duasHorasTrintaMinDezSeg = duasHorasVinteMinDezSeg.plusMinutes(10);
+System.out.println(duasHorasTrintaMinDezSeg); // 02:30:10
+System.out.println(duasHorasTrintaMinDezSeg.toString().equals("02:30:10"));
 
-No Windows, abra o instalador e não esqueça de selecionar todos os opcionais, como _adicionar code ao path_ e _adicionar "abrir com code" ao menu_, por exemplo.
+Time duasHorasTrintaUmMinTrintaSeg = duasHorasTrintaMinDezSeg.plusSeconds(80);
+System.out.println(duasHorasTrintaUmMinTrintaSeg); // 02:31:30
+System.out.println(duasHorasTrintaUmMinTrintaSeg.toString().equals("02:31:30"));
 
-No Linux, abra o arquivo `.deb` baixado no gerenciador de pacotes e instale normalmente conforme instruções de seu sistema operacional.
+Time dezenoveHorasVinteTresMinDezoitoSeg = new Time().plusHours(19).plusMinutes(23).plusSeconds(18);
+System.out.println(dezenoveHorasVinteTresMinDezoitoSeg); // 19:23:18
+System.out.println(dezenoveHorasVinteTresMinDezoitoSeg.toString().equals("19:23:18"));
 
-Este _template_ possui uma pasta [.vscode](.vscode) com as extensões necessárias em [extensions.json](.vscode/extensions.json) e as configurações recomendadas em [settings.json](.vscode/settings.json) para um **ambiente de ensino** (configuração didática). Fique a vontade para alterá-los como achar melhor.
+Time dezoitoHorasVinteDoisMinDezesseteSeg = dezenoveHorasVinteTresMinDezoitoSeg.plusHours(-1).plusMinutes(-1).plusSeconds(-1);
+System.out.println(dezoitoHorasVinteDoisMinDezesseteSeg); // 18:22:17
+System.out.println(dezoitoHorasVinteDoisMinDezesseteSeg.toString().equals("18:22:17"));
 
-A única extensão obrigatória é a _"vscjava.vscode-java-pack"_.
+Time dezesseisHorasVinteMinQuinzeSeg = dezoitoHorasVinteDoisMinDezesseteSeg.minusHours(2).minusMinutes(2).minusSeconds(2);
+System.out.println(dezesseisHorasVinteMinQuinzeSeg); // 16:20:15
+System.out.println(dezesseisHorasVinteMinQuinzeSeg.toString().equals("16:20:15"));
 
-A extensão _"EditorConfig"_ é bastante recomendada. Ela funciona junto com o arquivo [.editorconfig](.editorconfig) presente neste _template_ para padronizar a formatação dos códigos-fonte.
+Time vinteUmaHorasVinteMinQuinzeSeg = dezesseisHorasVinteMinQuinzeSeg.minusHours(-5);
+System.out.println(vinteUmaHorasVinteMinQuinzeSeg); // 21:20:15
+System.out.println(vinteUmaHorasVinteMinQuinzeSeg.toString().equals("21:20:15"));
 
-Finalmente, se preferes o editor em Português, instale a extensão _Portuguese (Brazil) Language Pack for Visual Studio Code_.
+Time dezenoveHoras = dezesseisHorasVinteMinQuinzeSeg.minus(vinteUmaHorasVinteMinQuinzeSeg);
+System.out.println(dezenoveHoras); // 19:00:00
+System.out.println(dezenoveHoras.toString().equals("19:00:00"));
+System.out.println(dezenoveHoras.isMidDay() == false);
 
+Time meiaNoite = dezenoveHoras.minus(dezenoveHoras);
+System.out.println(meiaNoite); // 00:00:00
+System.out.println(meiaNoite.toString().equals("00:00:00"));
+System.out.println(meiaNoite.isMidDay() == false);
+System.out.println(meiaNoite.isMidNight() == true);
+System.out.println(meiaNoite.plusHours(12).isMidDay() == true);
+System.out.println(meiaNoite.equals(zero) == true);
 
+Time tresHorasQuarentaMin = new Time(3, 40);
+System.out.println(tresHorasQuarentaMin); // 03:40:00
+System.out.println(tresHorasQuarentaMin.toString().equals("03:40:00"));
 
-## Instalação e Configuração do Git
+Time quinzeHorasQuarentaMin = tresHorasQuarentaMin.shift();
+System.out.println(quinzeHorasQuarentaMin); // 15:40:00
+System.out.println(quinzeHorasQuarentaMin.toString().equals("15:40:00"));
 
-O Git para Windows pode ser obtido neste link: <https://git-scm.com/download/win>. A instalação é simples e intuitiva. Como sempre, não esqueça dos opcionais, principalmente a opção _adicionar o git ao path_!
+Time tresHorasQuarentaMinutos = quinzeHorasQuarentaMin.shift();
+System.out.println(tresHorasQuarentaMinutos); // 03:40:00
+System.out.println(tresHorasQuarentaMinutos.toString().equals("03:40:00"));
 
-Para Linux, o comando `sudo apt install git` no terminal faz tudo.
+Time tresHorasQuarentaMinutosUmSegundo = tresHorasQuarentaMinutos.tick();
+System.out.println(tresHorasQuarentaMinutosUmSegundo); // 03:40:01
+System.out.println(tresHorasQuarentaMinutosUmSegundo.toString().equals("03:40:01"));
 
-Para verificar a instalação abra o _prompt_ ou um terminal e execute `git --version`. Se não acusou _"comando não encontrado"_ é porque está tudo funcionando perfeitamente.
+Time tresHorasQuarentaMinutosQuatroSegundos = tresHorasQuarentaMinutosUmSegundo.tick().tick().tick();
+System.out.println(tresHorasQuarentaMinutosQuatroSegundos); // 03:40:04
+System.out.println(tresHorasQuarentaMinutosQuatroSegundos.toString().equals("03:40:04"));
 
+Time quantoEuValho = tresHorasQuarentaMinutosQuatroSegundos.plusHours(50).plusMinutes(50).minusSeconds(50).tick().shift();
+System.out.println(quantoEuValho); // quanto?
+System.out.println(quantoEuValho.toString().equals("escreva aqui quanto eu valho"));
+```
 
+Implementar os métodos de conversão **de** e **para** `Time`, conforme os casos de teste.
 
-## Códigos-fonte
+```java
+Time noveQuarentaQuinze = new Time(9, 40, 15);
+// representação string, padrão 00:00:00
+System.out.println(noveQuarentaQuinze); // 09:40:15
+System.out.println(noveQuarentaQuinze.toString().equals("09:40:15"));
+// representação string com formato alternativo
+System.out.println(noveQuarentaQuinze.toLongString()); // 9 horas 40 minutos e 15 segundos
+System.out.println(noveQuarentaQuinze.toLongString().equals("9 horas 40 minutos e 15 segundos"));
 
-Considere adicionar os arquivos de código-fonte `.java` no diretório [src](./src/), como o exemplo [src/App.java](./src/App.java).
+// fromString, formato 00:00:00
+Time umaHoraTrintaSeisMinutos = Time.fromString("01:36:00");
+System.out.println(umaHoraTrintaSeisMinutos.toLongString()); // 1 hora e 36 minutos
+System.out.println(umaHoraTrintaSeisMinutos.toLongString().equals("1 hora e 36 minutos"));
 
+// fromDouble
+Time tresPontoOitocentosVinteQuatroHoras = Time.fromDouble(3.824);
+System.out.println(tresPontoOitocentosVinteQuatroHoras.toLongString()); // 3 horas 49 minutos e 26 segundos
+System.out.println(tresPontoOitocentosVinteQuatroHoras.toLongString().equals("3 horas 49 minutos e 26 segundos"));
+// sem arredondamentos
+System.out.println(Time.fromDouble(17.1447).toLongString()); // 17 horas 8 minutos e 40 segundos
+System.out.println(Time.fromDouble(17.1447).toLongString().equals("17 horas 8 minutos e 40 segundos"));
 
+// fromSeconds
+Time setentaSeisMilSeiscentosTrintaDoisSegundos = Time.fromSeconds(76632);
+System.out.println(setentaSeisMilSeiscentosTrintaDoisSegundos.toLongString()); // 21 horas 17 minutos e 12 segundos
+System.out.println(setentaSeisMilSeiscentosTrintaDoisSegundos.toLongString().equals("21 horas 17 minutos e 12 segundos"));
+System.out.println(Time.fromSeconds(68400).toLongString()); // 19 horas
+System.out.println(Time.fromSeconds(68400).toLongString().equals("19 horas"));
 
-## Licenciamento
+// toDouble
+Time dezesseisHorasQuarentaCincoMinOnzeSeg = Time.fromString("16:45:11");
+System.out.println(dezesseisHorasQuarentaCincoMinOnzeSeg.toDouble()); // 16.75305556 aproximadamente
+System.out.println(dezesseisHorasQuarentaCincoMinOnzeSeg.toDouble() == 16.75305556); // faça o ajuste para o valor correto retornado
+System.out.println(Time.fromString("13:04:59").toDouble()); // 13.08305556 aproximadamente
+System.out.println(Time.fromString("13:04:59").toDouble() == 13.08305556); // faça o ajuste para o valor correto retornado
+double trezePontoUnsQuebradosHoras = Time.fromString("13:04:59").toDouble();
+Time trezeHorasQuatroMinutosCinquentaNoveSegundos = Time.fromDouble(trezePontoUnsQuebradosHoras);
+System.out.println(trezeHorasQuatroMinutosCinquentaNoveSegundos.toLongString()); // 13 horas 4 minutos e 59 segundos
+System.out.println(trezeHorasQuatroMinutosCinquentaNoveSegundos.toLongString().equals("13 horas 4 minutos e 59 segundos"));
 
-Este _template_ é _open source_ licenciado sob a GPL, assim como todos os projetos derivados dele. Mais detalhes em [LICENÇA.md](LICENÇA.md).
+// fromTime
+Time trezeHorasQuatroMinutosCinquentaNoveSegundosCopia = Time.from(trezeHorasQuatroMinutosCinquentaNoveSegundos);
+// toShortString
+System.out.println(trezeHorasQuatroMinutosCinquentaNoveSegundosCopia.toShortString()); // 13h04m59s
+System.out.println(trezeHorasQuatroMinutosCinquentaNoveSegundosCopia.toShortString().equals("13h04m59s"));
+System.out.println(Time.fromString("15:03:00").toShortString()); // 15h03m
+System.out.println(Time.fromString("15:03:00").toShortString().equals("15h03m"));
+System.out.println(Time.fromString("15:00:01").toShortString()); // 15h00m01s
+System.out.println(Time.fromString("15:00:01").toShortString().equals("15h00m01s"));
+
+// constantes de classe (atributos estáticos)
+Time meioDia = Time.MIDDAY;
+System.out.println(meioDia.toShortString()); // 12h
+System.out.println(meioDia.toShortString().equals("12h"));
+System.out.println(Time.MIDDAY.toInt() == 43200); // segundos
+System.out.println(Time.MIDDAY.toDouble() == 12.0); // horas
+
+Time meiaNoite = Time.MIDNIGHT;
+System.out.println(meiaNoite.toShortString()); // 00h
+System.out.println(meiaNoite.toShortString().equals("00h"));
+System.out.println(Time.MIDNIGHT.toInt() == 0);
+System.out.println(Time.MIDNIGHT.toDouble() == 0.0);
+```
+
+---
+Obs.: os casos de teste não podem ser alterados, mas outros podem ser adicionados. Fique a vontade para adicionar códigos que imprimem ou separam os testes, por exemplo.

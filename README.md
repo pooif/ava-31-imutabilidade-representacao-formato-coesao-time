@@ -1,6 +1,6 @@
 # 3.1 // Imutabilidade, Representação, Formato e Coesão // Time
 
-Use este link do GitHub Classroom para ter sua cópia alterável deste repositório: <>
+Use este link do GitHub Classroom para ter sua cópia alterável deste repositório: <https://classroom.github.com/a/6bdeb1CS>
 
 Implementar respeitando os fundamentos de Orientação a Objetos.
 
